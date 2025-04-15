@@ -26,12 +26,19 @@ void msg_erro(char *msg){
 
 // Função para alocar ou realocar memória para o array de clientes
 Cliente* realocar_memoria_cliente(Cliente *clientes, int novo_tamanho) {
-    // Realoca memória para o array de clientes
-    if (clientes != null) {
+    if (clientes != NULL) {
+        Cliente *temp = (Cliente*) realloc(clientes, novo_tamanho * sizeof(Cliente));
 
+        if (temp == NULL) {
+            perror("Erro ao realocar!");
+        }
+
+        clientes = temp;
     }
 
-    return;
+    clientes = (Cliente*) malloc(novo_tamanho * sizeof(Cliente));
+
+    return clientes;
 }
 
 
@@ -41,10 +48,19 @@ Cliente* realocar_memoria_cliente(Cliente *clientes, int novo_tamanho) {
 
 // Função para alocar ou realocar memória para o array de emprestimos
 Emprestimo* realocar_memoria_emprestimo(Emprestimo *emprestimos, int novo_tamanho) {
+    if (emprestimos != NULL) {
+        Emprestimo *temp = (Emprestimo*) realloc(emprestimos, novo_tamanho * sizeof(Emprestimo));
 
-    // Realoca memória para o array de empréstimos
+        if (temp == NULL) {
+            perror("Erro ao realocar!");
+        }
 
-    return;
+        emprestimos = temp;
+    }
+
+    emprestimos = (Emprestimo*) malloc(novo_tamanho * sizeof(Emprestimo));
+
+    return emprestimos;
 }
 
 
