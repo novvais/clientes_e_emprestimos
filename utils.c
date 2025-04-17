@@ -64,8 +64,6 @@ Emprestimo* realocar_memoria_emprestimo(Emprestimo *emprestimos, int novo_tamanh
 
     emprestimos = (Emprestimo*) malloc(novo_tamanho * sizeof(Emprestimo));
 
-    printf("%p\n", (void*) emprestimos);
-
     // if(temp == NULL) {
     //     perror("Erro ao alocar memoria!");
     // }
@@ -136,8 +134,10 @@ Cliente *cadastrar_novo_cliente(Cliente *clientes, int *num_clientes) {
 
 // Solicita um novo empréstimo para um cliente
 void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
+    Cliente *novoCliente = NULL;
     int idCliente, qtdParcelas, opcao = 1;
     float valorEmprestimo;
+    Emprestimo novoEmprestimo;
 
     do {
         printf("Insira seu aqui seu ID de cadastro: ");
@@ -151,6 +151,8 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
 
         for (int i = 0; i < num_clientes; i++) {
             if (clientes[i].id == idCliente) {
+                novoCliente = &clientes[i];
+
                 break;
             }
 
@@ -158,6 +160,8 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
 
             continue;
         }
+
+        novoEmprestimo.cliente_id = novoCliente->id;
         
         printf("Digite o valor do emprestimo: ");
         if(scanf("%f", &valorEmprestimo) != 1) {
@@ -176,6 +180,8 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
             continue;
         }
 
+        novoEmprestimo.valor_emprestimo = valorEmprestimo;
+
         printf("Digite a quantidade de parcelas do emprestimo: ");
         if(scanf("%i", &qtdParcelas) != 1) {
             printf("Insira um valor valido!");
@@ -193,12 +199,14 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
             continue;
         }
 
+        novoEmprestimo.num_parcelas = qtdParcelas;
+
         opcao = 0;
     } while (opcao != 0);
     
-    calcular_valor_parcela(valorEmprestimo);
+    calcular_valor_parcela(&novoEmprestimo);
 
-    aprovar_reprovar_emprestimo();
+    aprovar_reprovar_emprestimo(novoCliente, &novoEmprestimo);
 }
 
 /*
@@ -207,6 +215,7 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
 
 // Calcula o valor da parcela do empréstimo
 void calcular_valor_parcela(Emprestimo *emprestimo) {
+    emprestimo->valor_parcela = emprestimo->valor_parcela * (1 + TAXA_JUROS);
 
 }
 
@@ -216,7 +225,15 @@ void calcular_valor_parcela(Emprestimo *emprestimo) {
 
 // Aprova ou reprova o empréstimo com base no salário do cliente
 void aprovar_reprovar_emprestimo(Cliente *cliente, Emprestimo *novo_emprestimo) {
+    if(novo_emprestimo->valor_parcela > cliente->salario * 0.20) {
+        printf("Emprestimo reprovado!");
 
+        novo_emprestimo->aprovacao = 0;
+
+        break;
+    }
+
+    novo_emprestimo->aprovacao = 1;
 }
 
 // Carrega os clientes do arquivo CSV e retorna um array de clientes

@@ -13,8 +13,8 @@
 #endif
 
 // Definição de cores ANSI (suportado em alguns terminais)
-#define COR_VERMELHO "\033[31m"
-#define COR_RESET "\033[0m"
+//#define COR_VERMELHO "\033[31m"
+//#define COR_RESET "\033[0m"
 
 #define MAX_NOME 50
 
