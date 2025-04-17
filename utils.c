@@ -31,6 +31,8 @@ Cliente* realocar_memoria_cliente(Cliente *clientes, int novo_tamanho) {
 
         if (temp == NULL) {
             perror("Erro ao realocar!");
+
+            return NULL;
         }
 
         clientes = temp;
@@ -53,12 +55,22 @@ Emprestimo* realocar_memoria_emprestimo(Emprestimo *emprestimos, int novo_tamanh
 
         if (temp == NULL) {
             perror("Erro ao realocar!");
+
+            return NULL;
         }
 
         emprestimos = temp;
     }
 
     emprestimos = (Emprestimo*) malloc(novo_tamanho * sizeof(Emprestimo));
+
+    printf("%p\n", (void*) emprestimos);
+
+    // if(temp == NULL) {
+    //     perror("Erro ao alocar memoria!");
+    // }
+
+    // emprestimos = temp;
 
     return emprestimos;
 }
@@ -70,8 +82,52 @@ Emprestimo* realocar_memoria_emprestimo(Emprestimo *emprestimos, int novo_tamanh
 
 // Cadastra um novo cliente e adiciona ao array de clientes
 Cliente *cadastrar_novo_cliente(Cliente *clientes, int *num_clientes) {
+    clientes = realocar_memoria_cliente(clientes, (*num_clientes + 1));
+    
+    if (clientes == NULL) {
+        perror("Erro ao alocar memória");
 
-    return;
+        return NULL;
+    }
+
+    int opcao = 1;
+
+    do {
+        printf("Qaul seu nome? ");
+        fgets(clientes[*num_clientes].nome, sizeof(clientes[*num_clientes].nome), stdin);
+
+        clientes[*num_clientes].nome[strcspn(clientes[*num_clientes].nome, "\n")] = '\0';
+
+        if (strlen(clientes[*num_clientes].nome) == 0) {
+            printf("Nome invalido!");
+
+            continue;
+        }
+
+        printf("Quantos o seu salario? ");
+        if(scanf("%f", &clientes[*num_clientes].salario) != 1) {
+            printf("Insira um valor de salario valido!");
+
+            limpar_buffer();
+
+            continue;
+        }
+
+        if (clientes[*num_clientes].salario < 2000.00 || clientes[*num_clientes].salario > 15000.00) {
+            printf("O salario nao pode ser abaixo de R$2000.00 ou acima de R$15000.00.");
+
+            opcao = 0;
+        }
+
+        opcao = 0;
+    } while (opcao != 0);
+    
+
+    getchar();
+
+    (*num_clientes)++;
+
+    return clientes;
 }
 
 /*
@@ -80,7 +136,69 @@ Cliente *cadastrar_novo_cliente(Cliente *clientes, int *num_clientes) {
 
 // Solicita um novo empréstimo para um cliente
 void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
+    int idCliente, qtdParcelas, opcao = 1;
+    float valorEmprestimo;
 
+    do {
+        printf("Insira seu aqui seu ID de cadastro: ");
+        if(scanf("%i", &idCliente) != 1) {
+            printf("Insira um ID valido!");
+
+            limpar_buffer();
+
+            continue;
+        }
+
+        for (int i = 0; i < num_clientes; i++) {
+            if (clientes[i].id == idCliente) {
+                break;
+            }
+
+            printf("Cliente nao encontrado, digite um ID existente!");
+
+            continue;
+        }
+        
+        printf("Digite o valor do emprestimo: ");
+        if(scanf("%f", &valorEmprestimo) != 1) {
+            printf("Insira um valor valido!");
+
+            limpar_buffer();
+
+            continue;
+        }
+
+        if (valorEmprestimo < 1000.00 || valorEmprestimo > 200000.00) {
+            printf("O valor do emprestimo nao pode ser abaixo de R$1000.00 e acima de R$200000.00.");
+
+            limpar_buffer();
+
+            continue;
+        }
+
+        printf("Digite a quantidade de parcelas do emprestimo: ");
+        if(scanf("%i", &qtdParcelas) != 1) {
+            printf("Insira um valor valido!");
+
+            limpar_buffer();
+
+            continue;
+        }
+
+        if (qtdParcelas < 6 || qtdParcelas > 180) {
+            printf("O quantidade de parcelas nao pode ser abaixo de 6 e acima de 180 parcelas.");
+
+            limpar_buffer();
+
+            continue;
+        }
+
+        opcao = 0;
+    } while (opcao != 0);
+    
+    calcular_valor_parcela(valorEmprestimo);
+
+    aprovar_reprovar_emprestimo();
 }
 
 /*
@@ -100,8 +218,6 @@ void calcular_valor_parcela(Emprestimo *emprestimo) {
 void aprovar_reprovar_emprestimo(Cliente *cliente, Emprestimo *novo_emprestimo) {
 
 }
-
-
 
 // Carrega os clientes do arquivo CSV e retorna um array de clientes
 // O número de clientes é retornado através do ponteiro num_clientes
