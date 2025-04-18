@@ -3,6 +3,10 @@
 #define TAXA_JUROS 0.05
 #define LIMITE_PARCELA 0.20
 
+/*Alunos: Eduardo Novais e Mariana Sabino
+
+Professor eu acabei devolvendo a folha pro senhor e não marcar a opção se eu usei IA ou não, mas eu não usei codigos feitos por IA.
+*/
 
 // Definição de macros para limpar a tela
 void limpar_buffer(){
@@ -20,6 +24,31 @@ void msg_erro(char *msg){
     getchar();
 }
 
+int validarString(char *nome) { // Adicionei essa função para validar string, se o usuario digitar um numero no lugar do nome ele retornar um erro
+    size_t len = strlen(nome);
+
+    if (len > 0 && nome[len - 1] == '\n') {
+        nome[len - 1] = '\0';
+        len--;
+    }
+
+    if (len == 0) {
+        printf("Nome invalido. O nome nao pode estar vazio.\n");
+
+        return 0;
+    }
+
+    for (size_t i = 0; i < len; i++) {
+        if (!isalpha(nome[i]) && nome[i] != ' ') {
+            printf("Nome invalido. Utilize apenas letras e espacos.\n");
+
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 /* 
     ATENÇÃO: A função "realocar_memoria_cliente" deve ser implementada pelo aluno 
 */
@@ -32,10 +61,14 @@ Cliente* realocar_memoria_cliente(Cliente *clientes, int novo_tamanho) {
         if (temp == NULL) {
             perror("Erro ao realocar!");
 
+            limpar_buffer();
+
             return NULL;
         }
 
         clientes = temp;
+
+        return clientes;
     }
 
     clientes = (Cliente*) malloc(novo_tamanho * sizeof(Cliente));
@@ -56,19 +89,17 @@ Emprestimo* realocar_memoria_emprestimo(Emprestimo *emprestimos, int novo_tamanh
         if (temp == NULL) {
             perror("Erro ao realocar!");
 
+            limpar_buffer();
+
             return NULL;
         }
 
         emprestimos = temp;
+
+        return emprestimos;
     }
 
     emprestimos = (Emprestimo*) malloc(novo_tamanho * sizeof(Emprestimo));
-
-    // if(temp == NULL) {
-    //     perror("Erro ao alocar memoria!");
-    // }
-
-    // emprestimos = temp;
 
     return emprestimos;
 }
@@ -85,26 +116,31 @@ Cliente *cadastrar_novo_cliente(Cliente *clientes, int *num_clientes) {
     if (clientes == NULL) {
         perror("Erro ao alocar memória");
 
+        limpar_buffer();
+
         return NULL;
     }
 
     int opcao = 1;
 
     do {
-        printf("Qaul seu nome? ");
-        fgets(clientes[*num_clientes].nome, sizeof(clientes[*num_clientes].nome), stdin);
+        do{
+            printf("\n\nDigite seu nome? ");
+            if (fgets(clientes[*num_clientes].nome, sizeof(clientes[*num_clientes].nome), stdin) == NULL) {
+                printf("\nNome invalido!");
 
-        clientes[*num_clientes].nome[strcspn(clientes[*num_clientes].nome, "\n")] = '\0';
+                limpar_buffer();
 
-        if (strlen(clientes[*num_clientes].nome) == 0) {
-            printf("Nome invalido!");
+                continue;
+            }
 
-            continue;
-        }
+            clientes[*num_clientes].nome[strcspn(clientes[*num_clientes].nome, "\n")] = '\0';
+        } while (!validarString(clientes[*num_clientes].nome));
+        
 
-        printf("Quantos o seu salario? ");
+        printf("\nDigite o seu salario? ");
         if(scanf("%f", &clientes[*num_clientes].salario) != 1) {
-            printf("Insira um valor de salario valido!");
+            printf("\n\nInsira um valor de salario valido!");
 
             limpar_buffer();
 
@@ -112,7 +148,7 @@ Cliente *cadastrar_novo_cliente(Cliente *clientes, int *num_clientes) {
         }
 
         if (clientes[*num_clientes].salario < 2000.00 || clientes[*num_clientes].salario > 15000.00) {
-            printf("O salario nao pode ser abaixo de R$2000.00 ou acima de R$15000.00.");
+            printf("\n\nO salario nao pode ser abaixo de R$2000.00 ou acima de R$15000.00.");
 
             opcao = 0;
         }
@@ -135,14 +171,14 @@ Cliente *cadastrar_novo_cliente(Cliente *clientes, int *num_clientes) {
 // Solicita um novo empréstimo para um cliente
 void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
     Cliente *novoCliente = NULL;
-    int idCliente, qtdParcelas, opcao = 1;
+    int idCliente, qtdParcelas, opcao = 1, opcao1 = 1;
     float valorEmprestimo;
     Emprestimo novoEmprestimo;
 
     do {
-        printf("Insira seu aqui seu ID de cadastro: ");
+        printf("\n\nInsira seu aqui seu ID de cadastro: ");
         if(scanf("%i", &idCliente) != 1) {
-            printf("Insira um ID valido!");
+            printf("\n\nInsira um ID valido!");
 
             limpar_buffer();
 
@@ -153,16 +189,20 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
             if (clientes[i].id == idCliente) {
                 novoCliente = &clientes[i];
 
-                break;
+                break;;
             }
 
-            printf("Cliente nao encontrado, digite um ID existente!");
+            printf("\n\nCliente nao encontrado, digite um ID existente!/n");
 
             continue;
         }
 
         novoEmprestimo.cliente_id = novoCliente->id;
-        
+
+        opcao = 0;
+    } while (opcao != 0);
+    
+    do {
         printf("Digite o valor do emprestimo: ");
         if(scanf("%f", &valorEmprestimo) != 1) {
             printf("Insira um valor valido!");
@@ -173,7 +213,7 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
         }
 
         if (valorEmprestimo < 1000.00 || valorEmprestimo > 200000.00) {
-            printf("O valor do emprestimo nao pode ser abaixo de R$1000.00 e acima de R$200000.00.");
+            printf("\n\nO valor do emprestimo nao pode ser abaixo de R$1000.00 e acima de R$200000.00.");
 
             limpar_buffer();
 
@@ -182,9 +222,9 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
 
         novoEmprestimo.valor_emprestimo = valorEmprestimo;
 
-        printf("Digite a quantidade de parcelas do emprestimo: ");
+        printf("\nDigite a quantidade de parcelas do emprestimo: ");
         if(scanf("%i", &qtdParcelas) != 1) {
-            printf("Insira um valor valido!");
+            printf("\n\nInsira um valor valido!");
 
             limpar_buffer();
 
@@ -192,7 +232,7 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
         }
 
         if (qtdParcelas < 6 || qtdParcelas > 180) {
-            printf("O quantidade de parcelas nao pode ser abaixo de 6 e acima de 180 parcelas.");
+            printf("\n\nO quantidade de parcelas nao pode ser abaixo de 6 e acima de 180 parcelas.");
 
             limpar_buffer();
 
@@ -201,12 +241,20 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
 
         novoEmprestimo.num_parcelas = qtdParcelas;
 
-        opcao = 0;
-    } while (opcao != 0);
+        opcao1 = 0;
+    } while (opcao1 != 0);
     
     calcular_valor_parcela(&novoEmprestimo);
 
     aprovar_reprovar_emprestimo(novoCliente, &novoEmprestimo);
+
+    printf("\n\nValor da parcela com juros: R$%.2f\n", novoEmprestimo.valor_parcela);
+
+    if(novoEmprestimo.aprovacao == 0) {
+        printf("\nEmprestimo Reprovado!\n");
+    } else {
+        printf("\nEmprestimo Aprovado!\n");
+    }
 }
 
 /*
@@ -215,8 +263,7 @@ void solicitar_novo_emprestimo(Cliente *clientes, int num_clientes) {
 
 // Calcula o valor da parcela do empréstimo
 void calcular_valor_parcela(Emprestimo *emprestimo) {
-    emprestimo->valor_parcela = emprestimo->valor_parcela * (1 + TAXA_JUROS);
-
+    emprestimo->valor_parcela = (emprestimo->valor_emprestimo / emprestimo->num_parcelas) * (1 + TAXA_JUROS);
 }
 
 /*
@@ -226,11 +273,9 @@ void calcular_valor_parcela(Emprestimo *emprestimo) {
 // Aprova ou reprova o empréstimo com base no salário do cliente
 void aprovar_reprovar_emprestimo(Cliente *cliente, Emprestimo *novo_emprestimo) {
     if(novo_emprestimo->valor_parcela > cliente->salario * 0.20) {
-        printf("Emprestimo reprovado!");
-
         novo_emprestimo->aprovacao = 0;
 
-        break;
+        return;
     }
 
     novo_emprestimo->aprovacao = 1;

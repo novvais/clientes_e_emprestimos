@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h> //Adicionei por causa da função isalpha()
 // #include <stdio_ext.h>
 
 #ifdef _WIN32
@@ -13,12 +14,12 @@
 #endif
 
 // Definição de cores ANSI (suportado em alguns terminais)
-//#define COR_VERMELHO "\033[31m"
-//#define COR_RESET "\033[0m"
+#define COR_VERMELHO "\033[31m"
+#define COR_RESET "\033[0m"
 
 #define MAX_NOME 50
 
-typedef struct Emprestimo {
+typedef struct {
     int cliente_id;
     float valor_emprestimo;
     int num_parcelas;
@@ -27,7 +28,7 @@ typedef struct Emprestimo {
     int ativo;              // 1 para "Ativo", 0 para "Inativo"
 } Emprestimo;
 
-typedef struct Cliente {
+typedef struct {
     int id;
     char nome[MAX_NOME];
     float salario;

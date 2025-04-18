@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         getchar(); // Limpar o buffer do teclado
 
         switch (opcao) {
-            case 1:
+            case 1: {
                 Cliente *temp_clientes = cadastrar_novo_cliente(clientes, &num_clientes);
                 if (temp_clientes) {
                     clientes = temp_clientes;
@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
                     fprintf(stderr, "Erro ao cadastrar novo cliente.\n");
                 }
                 break;
+            }
+                
             case 2:
                 solicitar_novo_emprestimo(clientes, num_clientes);
                 break;
